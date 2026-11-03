@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CodePulse vs Tools</title><style>
+:root {
+  --bg: #fbfaf7; --surface: #ffffff; --ink: #1d232b; --muted: #5b6672; --line: #e3e0d8;
+  --accent: #1f5f8b; --good: #2f7d4f; --warn: #a8620b; --bad: #a23b3b; --chip: #eef3f7;
+  --code: #f3f1ec; --good-bg: #e5f2ea; --ok-bg: #f7eedf; --bad-bg: #f6e3e3;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #14181d; --surface: #1b2026; --ink: #e6e9ed; --muted: #9aa5b1; --line: #2c333b;
+    --accent: #7db7e0; --good: #6cc08f; --warn: #e0a85a; --bad: #e88080; --chip: #222a33;
+    --code: #222830; --good-bg: #1d3326; --ok-bg: #3a2e1b; --bad-bg: #3b2224;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #14181d; --surface: #1b2026; --ink: #e6e9ed; --muted: #9aa5b1; --line: #2c333b;
+  --accent: #7db7e0; --good: #6cc08f; --warn: #e0a85a; --bad: #e88080; --chip: #222a33;
+  --code: #222830; --good-bg: #1d3326; --ok-bg: #3a2e1b; --bad-bg: #3b2224;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink);
+  font: 16px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif; }
+main { max-width: 1100px; margin: 0 auto; padding: 32px 16px 80px; }
+header.hero { border-bottom: 1px solid var(--line); padding-bottom: 20px; margin-bottom: 28px; }
+h1 { font-size: 30px; line-height: 1.2; margin: 0 0 6px; letter-spacing: -0.01em; }
+h2 { font-size: 22px; margin: 44px 0 10px; padding-top: 8px; border-top: 1px solid var(--line); }
+h3 { font-size: 17px; margin: 26px 0 8px; }
+p, li { max-width: 80ch; }
+a { color: var(--accent); }
+small, .muted { color: var(--muted); }
+code { background: var(--code); padding: 1px 5px; border-radius: 4px; font-size: 0.86em;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace; word-break: break-word; }
+.kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(200px, 100%), 1fr)); gap: 12px; margin: 20px 0; }
+.kpi { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; }
+.kpi b { display: block; font-size: 28px; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.kpi span { color: var(--muted); font-size: 14px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 16px 18px; margin: 14px 0; }
+.callout { border-left: 4px solid var(--accent); }
+.callout.warn { border-left-color: var(--warn); }
+.callout.good { border-left-color: var(--good); }
+.table-wrap { overflow-x: auto; margin: 10px 0; }
+table { border-collapse: collapse; width: 100%; background: var(--surface); font-size: 14px; }
+th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { font-size: 13px; color: var(--muted); font-weight: 600; white-space: nowrap; }
+td.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.bar { height: 8px; background: var(--chip); border-radius: 4px; overflow: hidden; margin: 4px 0 2px; min-width: 90px; }
+.bar span { display: block; height: 100%; background: var(--accent); }
+.bar.good span { background: var(--good); }
+.bar.ok span { background: var(--warn); }
+.bar.bad span { background: var(--bad); }
+.chip { display: inline-block; background: var(--chip); border-radius: 999px; padding: 1px 10px; font-size: 12.5px; margin: 2px 4px 2px 0; white-space: nowrap; }
+.chip.good { background: var(--good-bg); color: var(--good); }
+.chip.ok { background: var(--ok-bg); color: var(--warn); }
+.chip.bad { background: var(--bad-bg); color: var(--bad); }
+details.repo { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; margin: 10px 0; padding: 4px 14px; }
+details.repo summary { cursor: pointer; padding: 10px 0; }
+details.repo[open] summary { border-bottom: 1px solid var(--line); margin-bottom: 8px; }
+.filters { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0 12px; }
+.filters button { font: inherit; font-size: 14px; border: 1px solid var(--line); background: var(--surface); color: var(--ink);
+  border-radius: 999px; padding: 4px 12px; cursor: pointer; }
+.filters button[aria-pressed="true"] { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+.repo-card { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 4px 18px 14px; margin: 18px 0; }
+.repo-card h3 { margin: 14px 0 8px; font-size: 19px; }
+.repo-card h4 { font-size: 15px; margin: 14px 0 4px; }
+.mini { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(120px, 100%), 1fr)); gap: 8px; margin: 8px 0 10px; }
+.mini div { background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; }
+.mini b { display: block; font-size: 19px; font-variant-numeric: tabular-nums; }
+.mini span { color: var(--muted); font-size: 12.5px; }
+.note { border-left: 3px solid var(--accent); padding: 2px 0 2px 12px; }
+ul.issues { padding-left: 18px; }
+ul.issues li { margin: 6px 0; font-size: 14.5px; }
+.repo-card details summary { cursor: pointer; color: var(--accent); margin: 6px 0; }
+dl.glossary { display: grid; grid-template-columns: minmax(140px, 220px) 1fr; gap: 6px 18px; }
+dl.glossary dt { font-weight: 600; }
+dl.glossary dd { margin: 0; }
+nav.toc { font-size: 14.5px; display: flex; flex-wrap: wrap; gap: 4px 14px; }
+nav.toc a { white-space: nowrap; }
+.repo-card a, td a { overflow-wrap: anywhere; }
+@media (max-width: 640px) {
+  h1 { font-size: 24px; }
+  dl.glossary { grid-template-columns: 1fr; }
+}
+</style></head>
+<body><main>
+<header class="hero"><h1>CodePulse compared with Ruff, Bandit, Semgrep and SonarQube</h1>
+<p class="muted">Same files, same commits, every tool run locally · local report, not published ·
+nothing reported to any project · 2026-11-02</p></header>
+
+<section><h2>Summary</h2>
+<div class="kpis">
+<div class=kpi><b>217</b><span>real issues CodePulse found and judges confirmed</span></div>
+<div class=kpi><b>93 (43%)</b><span>also flagged by at least one other tool</span></div>
+<div class=kpi><b>124 (57%)</b><span>found by CodePulse only</span></div>
+<div class=kpi><b>77</b><span>found by Ruff</span></div><div class=kpi><b>25</b><span>found by Bandit</span></div><div class=kpi><b>11</b><span>found by Semgrep</span></div><div class=kpi><b>41</b><span>found by SonarQube</span></div>
+</div>
+<div class="card callout"><p><b>Bottom line.</b> The other tools overlap with CodePulse on generic Python problems, but they miss most of what is specific to AI back ends. They also bury what they do catch in much more noise.</p>
+<ul>
+<li><b>Overlap.</b> 93 of the 217 real issues (43%) are also flagged by at least one of Ruff, Bandit, Semgrep or SonarQube.
+ <ul>
+ <li>Most of that overlap comes from broad rules: Ruff's "blind except" (BLE001), and Ruff/Bandit's rule against SQL built from strings.</li>
+ <li>Blocking calls in async code are the one area where other tools match CodePulse issue for issue: Ruff's async rules and SonarQube's (S7493 file, S7487 subprocess, S7499 HTTP) each catch all or almost all 24.</li>
+ </ul></li>
+<li><b>CodePulse only.</b> 124 issues (57%) were flagged by none of the other tools:
+ <ul>
+ <li>all 33 LLM-call issues: timeouts, output limits, failure handling, prompt assembly, history</li>
+ <li>all 23 unauthenticated endpoints</li>
+ <li>21 of 24 cases of secrets or personal data written to logs</li>
+ <li>every thread, future and database-pool limit</li>
+ </ul>
+ Of the 76 security and privacy issues, the other tools found 22.</li>
+<li><b>P1s.</b> 14 of the 17 P1 issues are also flagged by some tool, mostly by Bandit/Ruff's string-SQL and hard-coded-password rules. Three confirmed SQL injections were flagged by none of them: R2R <code>chunks.py</code>, and Open WebUI's MariaDB and Oracle vector stores.</li>
+<li><b>No AI rules.</b> SonarQube Community has no rules for LLM calls, prompts or agents. Its built-in "Sonar agentic AI" profile is a subset of its general rules, aimed at code written by AI, not at AI applications.</li>
+<li><b>The other direction.</b> A judged sample of 56 findings that the other tools raise and CodePulse does not gave:
+ <ul>
+ <li>2 real issues, both from SonarQube: an unreferenced <code>asyncio</code> task that can lose a storage write, and a <code>raise</code> of a tuple instead of an exception. Both are now CodePulse checks (<code>E07.unreferenced-task</code>, <code>E12.raise-non-exception</code>, rules 2026.11.12). They catch both cases, plus 4 more broken <code>raise</code> statements in bisheng and DB-GPT that SonarQube had not listed.</li>
+ <li>20 real but minor issues.</li>
+ <li>34 false alarms. The main causes were MD5 used as an ID, list-form subprocess calls and config key names.</li>
+ </ul></li>
+</ul>
+</div>
+</section>
+
+<section><h2>Which issues each tool also finds</h2>
+<p>An issue counts as found when the tool reports a rule from the same problem family within 3
+lines (for example Bandit B608 or SonarQube S2077 for SQL built from strings). Broad rules count:
+Ruff BLE001 flags every <code>except Exception</code>, so it "finds" most error-handling issues
+without telling them apart from correct handlers.</p>
+<div class=table-wrap><table><thead><tr><th>Kind of issue</th><th>Issues</th>
+<th>Ruff</th><th>Bandit</th><th>Semgrep</th><th>SonarQube</th><th>Any other tool</th></tr></thead>
+<tbody><tr><td>Blocking calls in async code</td><td class=num>24</td><td class=num>23</td><td class=num>0</td><td class=num>0</td><td class=num>24</td><td class=num><span class='chip bad'>24 (100%)</span></td></tr><tr><td>Error handling (swallowed, bare, default on failure)</td><td class=num>57</td><td class=num>45</td><td class=num>13</td><td class=num>0</td><td class=num>15</td><td class=num><span class='chip bad'>47 (82%)</span></td></tr><tr><td>SQL built from strings</td><td class=num>12</td><td class=num>5</td><td class=num>7</td><td class=num>3</td><td class=num>0</td><td class=num><span class='chip ok'>9 (75%)</span></td></tr><tr><td>Hard-coded secrets, wildcard CORS</td><td class=num>12</td><td class=num>4</td><td class=num>5</td><td class=num>5</td><td class=num>2</td><td class=num><span class='chip bad'>10 (83%)</span></td></tr><tr><td>Secrets and personal data in logs</td><td class=num>24</td><td class=num>0</td><td class=num>0</td><td class=num>3</td><td class=num>0</td><td class=num><span class='chip ok'>3 (12%)</span></td></tr><tr><td>Endpoint auth, input validation, status codes</td><td class=num>30</td><td class=num>0</td><td class=num>0</td><td class=num>0</td><td class=num>0</td><td class=num><span class='chip good'>0 (0%)</span></td></tr><tr><td>LLM calls: timeouts, output limits, failures, prompts, history</td><td class=num>33</td><td class=num>0</td><td class=num>0</td><td class=num>0</td><td class=num>0</td><td class=num><span class='chip good'>0 (0%)</span></td></tr><tr><td>Thread/future limits and timeouts, DB pools and sessions</td><td class=num>23</td><td class=num>0</td><td class=num>0</td><td class=num>0</td><td class=num>0</td><td class=num><span class='chip good'>0 (0%)</span></td></tr><tr><td>Agent graph state</td><td class=num>2</td><td class=num>0</td><td class=num>0</td><td class=num>0</td><td class=num>0</td><td class=num><span class='chip good'>0 (0%)</span></td></tr></tbody></table></div>
+</section>
+
+<section><h2>The 17 P1 issues</h2>
+<div class=table-wrap><table><thead><tr><th>Repo</th><th>Where</th><th>CodePulse check</th>
+<th>Other tools' matching rules</th></tr></thead><tbody><tr><td>1Panel-dev/MaxKB</td><td><code>apps/maxkb/conf.py:28</code></td><td><code>E11.hardcoded-secret</code></td><td>bandit:B105</td></tr><tr><td>SciPhi-AI/R2R</td><td><code>py/core/providers/crypto/bcrypt.py:17</code></td><td><code>E11.hardcoded-secret</code></td><td>bandit:B105, ruff:S105</td></tr><tr><td>SciPhi-AI/R2R</td><td><code>py/core/providers/crypto/nacl.py:18</code></td><td><code>E11.hardcoded-secret</code></td><td>bandit:B105, ruff:S105</td></tr><tr><td>SciPhi-AI/R2R</td><td><code>py/core/providers/database/documents.py:775</code></td><td><code>E08.sql-keyword-literal</code></td><td>bandit:B608, ruff:S608</td></tr><tr><td>agno-agi/agno</td><td><code>libs/agno/agno/tools/salesforce.py:205</code></td><td><code>E08.sql-keyword-literal</code></td><td>bandit:B608, ruff:S608</td></tr><tr><td>agno-agi/agno</td><td><code>libs/agno/agno/vectordb/couchbase/couchbase.py:1531</code></td><td><code>E08.sql-keyword-literal</code></td><td>bandit:B608, ruff:S608</td></tr><tr><td>apache/superset</td><td><code>superset/db_engine_specs/hive.py:297</code></td><td><code>E08.interpolated-sql</code></td><td>semgrep:avoid-sqlalchemy-text</td></tr><tr><td>chatchat-space/Langchain-Chatchat</td><td><code>libs/chatchat-server/chatchat/server/knowledge_base/kb_service/pg_kb_service.py:63</code></td><td><code>E08.interpolated-sql</code></td><td>bandit:B608, ruff:S608, semgrep:avoid-sqlalchemy-text</td></tr><tr><td>chatchat-space/Langchain-Chatchat</td><td><code>libs/chatchat-server/chatchat/server/knowledge_base/kb_service/relyt_kb_service.py:88</code></td><td><code>E08.interpolated-sql</code></td><td>semgrep:avoid-sqlalchemy-text</td></tr><tr><td>dataelement/bisheng</td><td><code>src/backend/bisheng/core/config/settings.py:23</code></td><td><code>E11.hardcoded-secret</code></td><td>bandit:B105, ruff:S105</td></tr><tr><td>microsoft/graphrag</td><td><code>packages/graphrag-vectors/graphrag_vectors/cosmosdb.py:293</code></td><td><code>E08.sql-keyword-literal</code></td><td>bandit:B608</td></tr><tr><td>microsoft/graphrag</td><td><code>packages/graphrag-vectors/graphrag_vectors/cosmosdb.py:311</code></td><td><code>E08.sql-keyword-literal</code></td><td>bandit:B608</td></tr><tr><td>sinaptik-ai/pandas-ai</td><td><code>pandasai/query_builders/paginator.py:113</code></td><td><code>E08.sql-keyword-literal</code></td><td>bandit:B608, ruff:S608</td></tr><tr><td>xerrors/Yuxi</td><td><code>backend/scripts/seed_initial_users.py:18</code></td><td><code>E11.hardcoded-secret</code></td><td>bandit:B105, ruff:S105, sonarqube:S2068</td></tr><tr><td>SciPhi-AI/R2R</td><td><code>py/core/providers/database/chunks.py:906</code></td><td><code>E08.interpolated-sql</code></td><td>none</td></tr><tr><td>open-webui/open-webui</td><td><code>backend/open_webui/retrieval/vector/dbs/mariadb_vector.py:475</code></td><td><code>E08.interpolated-sql</code></td><td>none</td></tr><tr><td>open-webui/open-webui</td><td><code>backend/open_webui/retrieval/vector/dbs/oracle23ai.py:794</code></td><td><code>E08.interpolated-sql</code></td><td>none</td></tr></tbody></table></div>
+</section>
+
+<section><h2>How much each tool raises on the same 171 files</h2>
+<div class=table-wrap><table><thead><tr><th>Tool</th><th>Findings</th><th>Note</th></tr></thead>
+<tbody><tr><td>CodePulse (default checks)</td><td class=num>1,410</td><td>Every finding has a severity, a reason and a fix</td></tr><tr><td>Ruff, all rules</td><td class=num>30,124</td><td>1,330 in its security, async and exception families; the rest is style (line length, quotes, annotations)</td></tr><tr><td>Bandit</td><td class=num>252</td><td>Security only</td></tr><tr><td>Semgrep (public packs)</td><td class=num>60</td><td>p/python, p/owasp-top-ten, p/secrets</td></tr><tr><td>SonarQube Community</td><td class=num>1,473</td><td>116 bugs, vulnerabilities and security hotspots; the rest code smells</td></tr></tbody></table></div>
+</section>
+
+<section><h2>The other direction: what the tools find that CodePulse does not</h2>
+<p>The table above starts from CodePulse's own issues, so it favours CodePulse. This section runs the other way: findings from each tool's security, bug and async families on the same files, with no CodePulse finding within 3 lines, sampled and judged with the same rubric.</p><div class=table-wrap><table><thead><tr><th>Tool</th><th>Security/bug findings</th><th>Not near any CodePulse finding</th><th>Sampled</th><th>Real</th><th>Real, minor</th><th>Wrong</th></tr></thead><tbody><tr><td>Ruff</td><td class=num>1,330</td><td class=num>639</td><td class=num>15</td><td class=num>0</td><td class=num>7</td><td class=num>8</td></tr><tr><td>Bandit</td><td class=num>252</td><td class=num>105</td><td class=num>15</td><td class=num>0</td><td class=num>4</td><td class=num>11</td></tr><tr><td>Semgrep</td><td class=num>60</td><td class=num>11</td><td class=num>11</td><td class=num>0</td><td class=num>0</td><td class=num>11</td></tr><tr><td>SonarQube</td><td class=num>116</td><td class=num>58</td><td class=num>15</td><td class=num>2</td><td class=num>7</td><td class=num>6</td></tr></tbody></table></div><h3>Real issues another tool found and CodePulse did not (2)</h3><ul><li><b>Skyvern-AI/skyvern</b> <code>skyvern/services/script_service.py:336</code> (SonarQube <code>S7502</code>): The artifact storage overwrite is started as an unreferenced background task, so the write can be dropped or fail silently while the caller carries on. <i>CodePulse gap: fire-and-forget asyncio task for a storage write</i></li><li><b>dataelement/bisheng</b> <code>src/backend/bisheng/pptx2md/multi_column.py:205</code> (SonarQube <code>S5632</code>): The code raises a tuple (ValueError, message) instead of an exception, which fails with a TypeError and hides the real error message. <i>CodePulse gap: raise of a tuple instead of an exception in error path</i></li></ul></section>
+
+<section><h2>Method and limits</h2><ul>
+<li><b>Same inputs.</b> The 171 files that hold the stored issues, at the pinned commits of the
+benchmark checkouts. Ruff 0.15.7 with every rule (<code>--isolated --select ALL</code>), Bandit
+1.9.4, Semgrep 1.179.0 with the public p/python, p/owasp-top-ten and p/secrets packs
+(<code>--metrics=off</code>; rules downloaded, no code uploaded), SonarQube Community Build
+26.10 running locally in Docker on 127.0.0.1.</li>
+<li><b>Bias.</b> The issue list came from CodePulse, so recall is measured on CodePulse's ground.
+The reverse section corrects for that with a judged sample of what the other tools see alone.</li>
+<li><b>What was not measured.</b> Commercial tiers: SonarQube Developer and Enterprise (taint
+analysis for injection), Semgrep Pro (cross-file data flow), CodeQL, Snyk Code. Taint tools
+would likely catch more of the SQL injections. LLM-specific checks were not found in the open
+rule sets used here.</li>
+<li><b>Labels.</b> Claude judges with the written rubric (<code>bench/JUDGING.md</code>); careful
+silver labels, not a human panel.</li>
+</ul></section>
+</main></body></html>
